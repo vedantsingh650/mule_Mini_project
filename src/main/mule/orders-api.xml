@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <apikit:config name="orders-api-config" api="resource::a6e5446f-1848-4593-a1e1-08d7a2e1502c:orderapi:2.0.0:raml:zip:orders-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="orders-api-main">
+        <http:listener path="/api/*" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="orders-api-config" />
+    </flow>
+    <flow name="orders-api-console">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="orders-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\user:application\json:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="fb7ca01c-eaa8-4b34-a8c7-93c19d212a9b" name="update_user_in_contact"/>
+    </flow>
+    <flow name="delete:\user\(user_id):orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="9e45197f-dc07-478b-87a6-f245c29688a1" name="delete_user_in_contact"/>
+    </flow>
+    <flow name="patch:\order:application\json:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="18a5a008-4333-4ac3-8689-6f96febaf64e" name="Update_order_details"/>
+    </flow>
+    <flow name="get:\order:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="d84a2a47-d115-4f2f-a7a2-4f5c3074d243" name="GET_orders"/>
+    </flow>
+    <flow name="post:\createpayment:application\json:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="96e968d7-3658-4b59-a1e5-4ee10623fb9b" name="payment_mock"/>
+    </flow>
+    <flow name="post:\order:application\json:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="2b4f477f-7ce9-4414-9891-d5da0e2ec29d" name="Creating_order"/>
+    </flow>
+    <flow name="post:\user:application\json:orders-api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="8a2b50c7-cf67-4033-b236-63f90acf2556" name="adding_user_in_contact"/>
+    </flow>
+</mule>

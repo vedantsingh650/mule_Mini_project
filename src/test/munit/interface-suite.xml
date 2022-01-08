@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="interface-suite.xml" />
+	<munit:test name="get:\order:orders-api-config-test" doc:id="0ef09a75-61cf-4b13-b052-3f12b2c5cab4" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="697317f2-ec29-4f0c-940e-87fe71c56f6b" >
+				<munit:payload value="#[readUrl('classpath://getorderordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getorderordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getorderordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\order:orders-api-config" doc:id="18e809a0-0435-4bff-bd4d-ea4e1b3bacd9" name="get:\order:orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="41f87688-030d-4fd4-bf1d-182209c88685" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="aeaaff21-5031-425f-aa1b-7fe56e3299ed" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="post:\createpayment:application\json:orders-api-config-test" doc:id="5f9c082e-c195-49fd-82be-71c43b19ecce" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="40bcebee-34b8-429f-b29b-967ab67b1537" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://postcreatepaymentapplicationjsonordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://postcreatepaymentapplicationjsonordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postcreatepaymentapplicationjsonordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\createpayment:application\json:orders-api-config" doc:id="e2aec67d-5116-4c17-a0cf-f7e02c9ebebe" name="post:\createpayment:application\json:orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="c6a15119-7ea5-4d64-a73e-56a87028af0d" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="b7f1d1c8-d0db-4c69-bc41-be5558c42ece" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="delete:\user\(user_id):orders-api-config-test" doc:id="ac10f347-4a0c-4e70-aebf-38dd608f5069" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="c9a4ce2a-33f8-4f6e-9fba-0b4338dd47ae" >
+				<munit:payload value="#[readUrl('classpath://deleteuseruseridordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://deleteuseruseridordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://deleteuseruseridordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete:\user\(user_id):orders-api-config" doc:id="450e7bf2-e560-41c7-9a55-09d9d5414451" name="delete:\user\(user_id):orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="7d1fc615-f49f-419a-acb5-c7ba6751b9c9" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="44439191-7986-4da6-8d6e-f1eca637eeeb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="put:\user:application\json:orders-api-config-test" doc:id="0c81cb92-8afc-4810-9b3a-6ffab73fc9db" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="02a3ffdf-98e9-4981-ab16-7d82da28920c" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://putuserapplicationjsonordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://putuserapplicationjsonordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://putuserapplicationjsonordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to put:\user:application\json:orders-api-config" doc:id="0a17a41d-2508-4ac0-a5da-ee5bc1211e28" name="put:\user:application\json:orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="5bf41f71-943d-4f2d-b912-73c981183827" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="1b386186-cf48-4350-91ca-fe3733faa05f" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="patch:\order:application\json:orders-api-config-test" doc:id="d2b41e71-40ae-44f0-a77a-3b88e781cf7b" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="0afe520f-4169-41e5-b665-b8ac971ad6f3" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://patchorderapplicationjsonordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://patchorderapplicationjsonordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://patchorderapplicationjsonordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to patch:\order:application\json:orders-api-config" doc:id="be8a9d16-3293-48be-9688-ef80bb00cba9" name="patch:\order:application\json:orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="74cd42a3-437d-4b31-a6da-3b887761c901" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="260a0748-6094-4f60-8104-d3d0ecf9025b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="post:\user:application\json:orders-api-config-test" doc:id="fa5d94f2-6d5b-4027-83c4-c6e0d6413dde" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="47aebff0-55b8-4e5c-8e97-8dd970c76e48" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://postuserapplicationjsonordersapiconfigtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://postuserapplicationjsonordersapiconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://postuserapplicationjsonordersapiconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\user:application\json:orders-api-config" doc:id="2c89eae0-ca9c-4638-902a-6a11ca37843f" name="post:\user:application\json:orders-api-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify Flow Reference" doc:id="66734c65-6eee-4380-a2c3-8da5cb1e603a" processor="flow-ref" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="169efdd9-bedc-43a6-9769-9ea47a6e9a28" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:s3="http://www.mulesoft.org/schema/mule/s3" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<flow name="read_S3_insert_DB_inventory" doc:id="db1de0e2-2493-40a2-9f9c-675b785f7faa" >
+		<http:listener doc:name="Listener" doc:id="c322c3b3-f265-4847-ba67-10402d235f91" config-ref="HTTP_Listener_config" path="/invent"/>
+		<s3:get-object doc:name="reading inventory from s3" doc:id="cac85d47-30bc-4041-8972-c3679dc77888" config-ref="Amazon_S3_Configuration" bucketName="umarvedantbucket" key="inventory.csv"/>
+		<logger level="INFO" doc:name="Logger" doc:id="365440d7-2d55-48dd-a895-6f7800705234" message='#["reading inventory from s3" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="b4d23534-54e9-41e6-82ed-1f2ab80abc98" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> 
+{
+	price: payload01.Price,
+	Pid: payload01.ProductID,
+	ProductName: payload01.ProductName,
+	BrandName: payload01.BrandName,
+	Stock: payload01.Stock
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="9215888b-e099-4e5b-ab18-22bf37797395" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO Inventory
+(
+    Pid, 
+    ProductName,
+    Price,
+    BrandName,
+	Stock
+)
+VALUES 
+    (:Pid,
+    :ProductName,
+    :price      ,
+    :BrandName  ,
+	:Stock)]]></db:sql>
+		</db:bulk-insert>
+		<logger level="INFO" doc:name="Logger" doc:id="3419d8ca-fe25-4836-bd06-e7a2f845a835" message="successfull"/>
+		<ee:transform doc:name="Transform Message" doc:id="e354490f-c17c-4399-b8fc-ed3261a76f71" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "successfull"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="read_S3_insert_salesforce_accounts" doc:id="b5b71c1b-8048-454c-b9a0-4861ea42ddef" >
+		<http:listener doc:name="Listener" doc:id="29bbe2bf-d15d-4eed-affd-08191052e46b" config-ref="HTTP_Listener_config" path="/salesforce"/>
+		<s3:get-object doc:name="reading accounts from s3" doc:id="b7013739-4186-4d0f-a11b-1c05f6c4acd7" config-ref="Amazon_S3_Configuration" bucketName="umarvedantbucket" key="accounts.data" outputMimeType='application/flatfile; schemapath="/Accountschema.ffd"'>
+			<ee:repeatable-file-store-stream bufferUnit="MB" />
+		</s3:get-object>
+		<logger level="INFO" doc:name="Logger" doc:id="7919ad36-f44f-4e35-9818-cb2e9c337fee" message='#["reading Accounts from s3" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="71b8ab9c-ba28-4216-9c78-8414aa9797eb">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) ->
+{
+	Name: payload01.Name,
+	Phone: payload01.Phone,
+	Website: payload01.Website,
+	NumberOfEmployees: payload01.Employees as Number
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+		<batch:job jobName="implantationBatch_Job" doc:id="f881e978-ce84-43c9-840c-3af5613b6cd8" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="7065537a-6559-4b61-83ac-d9ef61c8550b" >
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="c080dc07-3e3c-4d6b-b866-7d5f2407afb1" size="100">
+						<salesforce:create doc:name="insert" doc:id="2ae51126-1aad-4531-abf9-1a2eda7ff239" config-ref="Salesforce_Config" type="Account" />
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="c435ca1a-ce7b-46e6-af4f-39b23cee6018" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+		<ee:transform doc:name="Transform Message" doc:id="2bba4a9b-156a-4c15-8771-6d38f4247ad2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="adding_user_in_contact" doc:id="e68dccd4-4efc-4ae7-ad72-7d6eb8211dd8" >
+		<logger level="INFO" doc:name="Logger" doc:id="0629220e-a345-4540-862e-8258c8ca40e4" message='#["api invoked - adding_user_in_contact" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="620cd187-ba7f-458e-a8b9-e1cfbfd74037">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	LastName:payload01.Lastname,
+	AccountId: payload01.AccountID,
+	Phone: payload01.Phone,
+	Email: payload01.Email
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="90d706eb-a433-4cdd-969e-e25b5ba5984c" config-ref="Salesforce_Config" type="Contact"/>
+		<ee:transform doc:name="Transform Message" doc:id="fb55f98a-4e01-42f8-91f0-beaaccae3304" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="update_user_in_contact" doc:id="763420c9-1277-4d97-9c0a-438926698b98" >
+		<logger level="INFO" doc:name="Logger" doc:id="9a4cf24e-a26f-48f8-9f9e-bd8a88c0712b" message='#["api invoked - update_user_in_contact" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="68f82be9-a91e-4583-ad28-8f5419fa4c38" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	 {
+	Id:payload.contactid,
+	LastName:payload.Lastname,
+	Phone: payload.Phone,
+	Email: payload.Email
+}
+
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update type="Contact" doc:name="Update" doc:id="4ee653b2-43f9-4a41-8f96-432a76b18b96" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="e43108a8-f3c0-438d-819a-d7af577754de" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="delete_user_in_contact" doc:id="4c7232af-412e-40e7-b32c-c8ee1a500b97" >
+		<logger level="INFO" doc:name="Logger" doc:id="d9cf367c-1881-480e-8dc3-999a036e5bf7" message='#["api invoked - delete_user_in_contact" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="2e9469ed-a3a2-42eb-b665-2480aa31df71" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[
+	
+		attributes.uriParams.user_id
+	
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="4fad3cec-2028-477a-9bdf-89f523de2f80" message="#[payload]"/>
+		<salesforce:delete doc:name="Delete" doc:id="c9b0c555-4bf5-4c6b-8134-7b2e0b3c4dd6" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="77d0b775-0b75-44cc-be4b-fa5d5497bbc3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Creating_order" doc:id="4d9a531a-dcaf-479e-b170-cdf553207106" >
+		<logger level="INFO" doc:name="Logger" doc:id="0b1ba42c-e84e-4f9a-b534-5bbb9ddbc7cc" message='#["api invoked - Creating_order" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="503a7bd3-d7b5-4a71-a95c-fcb3a7981981" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	ContractId: payload.contractid,
+	AccountId: payload.Accountid,
+	EffectiveDate: payload.date as Date {format: 'MM/dd/yyyy'},
+	Status: payload.Status,
+	ShippingStreet: payload.ShippingStreet,
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create" doc:id="ec17a4b4-77da-416d-8c54-990c13166839" config-ref="Salesforce_Config" type="Order"/>
+		<ee:transform doc:name="Transform Message" doc:id="4953e295-76ba-4003-b841-ae70523f7006" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GET_orders" doc:id="3d6fef73-ffb8-46ae-87a7-81b8d4337eb5">
+		<logger level="INFO" doc:name="Logger" doc:id="623a9f17-b335-404a-b409-0d85783bf202" message='#["api invoked - get_order" ++ now()]'/>
+		<salesforce:query doc:name="Query" doc:id="1b17cc21-4bbe-43f8-abcc-be0d3fbdfe88" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[Select OrderId,TotalPrice,Quantity from OrderItem Where OrderId=':Id']]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	Id :  attributes.queryParams.order_id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="0c377b7e-8509-462e-97b9-287c274ee73f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="Update_order_details" doc:id="4fe225cc-0cd1-4e4f-a8f5-82096c0d704b" >
+		<logger level="INFO" doc:name="Logger" doc:id="0509a478-97e0-4c10-bf40-16e974f6f2b7" message='#["api invoked - update_order_details" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="3cdbb315-574e-48c2-a4ae-cbaaf0a49f2a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	Id: payload.id,
+	Quantity: payload.quantity
+}]
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:update doc:name="Update" doc:id="4a2e2438-18e2-43ac-845b-9e668d3f7b27" config-ref="Salesforce_Config" type="OrderItem"/>
+		<ee:transform doc:name="Transform Message" doc:id="56fc3b7e-d180-4e64-a489-dec7654ecf03" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="payment_mock" doc:id="3c908d34-da95-435b-8bf7-b4e4a0e9206f" >
+		<logger level="INFO" doc:name="Logger" doc:id="7c386391-ee1b-404c-87a1-630f4026cbd2" message='#["api invoked - payment mock" ++ now()]'/>
+		<ee:transform doc:name="Transform Message" doc:id="b0a35226-1197-45e9-94d3-1ac9af2b5e28" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "id": uuid(),
+    "currency": "INR",
+    "created": now(),
+    "is_disputed": false,
+    "status": "Initialized",
+    "amount":payload.amount,
+    "address": payload.address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-suite.xml" />
+	<munit:test name="read_S3_insert_salesforce_accounts-test" doc:id="48025b25-e091-40b0-9ab1-6eb5898c1e9b" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock reading accounts from s3" doc:id="fbf1a247-64e8-48b4-ba44-63633ebda484" processor="s3:get-object">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="b7013739-4186-4d0f-a11b-1c05f6c4acd7" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/flatfile schemaPath=&quot;/Accountschema.ffd&quot; --- readUrl('classpath://readS3insertsalesforceaccountstest\mock_payload.dwl')]" mediaType='application/flatfile schemaPath="/Accountschema.ffd"' encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://readS3insertsalesforceaccountstest\mock_attributes.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock implantationBatch_Job" doc:id="8807f7d0-dc52-4fcf-afcc-01f4074800c9" processor="batch:job">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="f881e978-ce84-43c9-840c-3af5613b6cd8" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://readS3insertsalesforceaccountstest\mock_payload1.dwl')]" />
+					<munit-tools:variables >
+						<munit-tools:variable key="batchJobInstanceId" value="#[readUrl('classpath://readS3insertsalesforceaccountstest\mock_variable_.dwl')]" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="a8695f05-c0df-475e-bb25-dec161ba5fb1" >
+				<munit:payload value="#[readUrl('classpath://readS3insertsalesforceaccountstest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://readS3insertsalesforceaccountstest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to read_S3_insert_salesforce_accounts" doc:id="242765a0-6cd0-43d1-bce5-5d6023eb705d" name="read_S3_insert_salesforce_accounts"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="read_S3_insert_DB_inventory-test" doc:id="ff461532-9bcc-4550-b3bb-e570b8ec3b6f" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock reading inventory from s3" doc:id="06ab1846-a952-4f52-9d8e-ba62de2a7b04" processor="s3:get-object">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="cac85d47-30bc-4041-8972-c3679dc77888" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output text/csv --- readUrl('classpath://readS3insertDBinventorytest\mock_payload.dwl')]" mediaType="text/csv" encoding="UTF-8" />
+					<munit-tools:attributes value="#[readUrl('classpath://readS3insertDBinventorytest\mock_attributes.dwl')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Bulk insert" doc:id="a79538b0-4810-4315-adc8-b1edf187ed24" processor="db:bulk-insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9215888b-e099-4e5b-ab18-22bf37797395" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://readS3insertDBinventorytest\mock_payload1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="77b2b5af-3029-40e2-96f0-6b4389b7752c" >
+				<munit:payload value="#[readUrl('classpath://readS3insertDBinventorytest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://readS3insertDBinventorytest\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to read_S3_insert_DB_inventory" doc:id="67363de1-bf56-440c-a844-9af0691345b5" name="read_S3_insert_DB_inventory"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="26fb6152-87a4-44a2-a522-5091657d1ba0" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import readS3insertDBinventorytest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_4d9a531a_dcaf_479e_b170_cdf553207106_Input_Payload = {
+  date: String, 
+  Status: String, 
+  Accountid: String, 
+  "Shipping Street": String, 
+  contractid: String, 
+  _?: Any
+}
+

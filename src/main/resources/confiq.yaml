@@ -1,0 +1,15 @@
+db:
+ host: "b43ohdssj7xxugs8zzb6-mysql.services.clever-cloud.com"
+ user: "udpg2ftz93efgmhr"
+ password: "mO280FNsK1TQIbWmkJp0"
+ port: "3306"
+ database: "b43ohdssj7xxugs8zzb6"
+salesforce:
+ user: "umar.n.faruq@apisero.com"
+ pass: "Dudedude12@"
+ token: "mdEKVkLP97D6vSFS8YYTivAt"
+amazons3:
+ accesskey : "AKIERFGTYNIM4ERMKAF4"
+ secretkey : "Y3GfHw711bzmaXEasdfgKPGP6/P/YTRXB+QVvaq"
+http:
+ port: "8081"

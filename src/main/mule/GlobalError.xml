@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<error-handler name="Global_Error_handler" doc:id="902dd816-539d-465b-a1fb-53c101351a9e" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b4bea043-0179-48c5-92ad-d3585575ec97" type="APIKIT:NOT_FOUND" >
+			<ee:transform doc:name="Transform Message" doc:id="6d62a2f5-12ab-4c0c-ba61-788a8d6888f8" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1b1401ee-1010-49c0-a24f-7477052e3836" type="APIKIT:BAD_REQUEST" >
+			<ee:transform doc:name="Transform Message" doc:id="7fc17f33-fbeb-4220-a94c-60d72eda74b4" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2bd7041f-0d6b-477a-abec-53ed2f394285" type="APIKIT:METHOD_NOT_ALLOWED" >
+			<ee:transform doc:name="Transform Message" doc:id="53ce3486-2b0c-400e-b5f8-dd56624c5c38" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7e514d31-37d0-4604-8776-93bcce0ed935" type="APIKIT:NOT_ACCEPTABLE" >
+			<ee:transform doc:name="Transform Message" doc:id="74976bb1-9085-4658-a7cd-5256ceea8d6a" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="09796740-9172-448c-b598-25348d0d10a7" type="APIKIT:UNSUPPORTED_MEDIA_TYPE" >
+			<ee:transform doc:name="Transform Message" doc:id="c0c04986-eb50-4ea7-a2ac-043482963bf8" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f389dc89-4180-4899-bdf6-74387cf08bac" type="APIKIT:NOT_IMPLEMENTED" >
+			<ee:transform doc:name="Transform Message" doc:id="de408f9f-4c92-4e02-96b7-06bba2b332de" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1abccd58-bcc8-4fe1-a187-318bf042fcbd" type="S3:ACCESS_DENIED, S3:ACCOUNT_PROBLEM, S3:AMBIGUOUS_GRANT_BY_EMAIL_ADDRESS, S3:BAD_DIGEST, S3:BUCKET_ALREADY_EXISTS, S3:BUCKET_ALREADY_OWNED_BY_YOU, S3:BUCKET_NOT_EMPTY, S3:CONNECTIVITY, S3:CREDENTIALS_NOT_SUPPORTED, S3:CROSS_LOCATION_LOGGING_PROHIBITED, S3:ENTITY_TOO_LARGE, S3:ENTITY_TOO_SMALL, S3:EXPIRED_TOKEN, S3:ILLEGAL_VERSIONING_CONFIGURATION_EXCEPTION, S3:INCOMPLETE_BODY, S3:INCORRECT_NUMBER_OF_FILES_IN_POST_REQUEST, S3:INLINE_DATA_TOO_LARGE, S3:INTERNAL_ERROR, S3:INVALID_ACCESS_KEY_ID, S3:INVALID_ADDRESSING_HEADER, S3:INVALID_ARGUMENT, S3:INVALID_BUCKET_NAME, S3:INVALID_BUCKET_STATE, S3:INVALID_DIGEST, S3:INVALID_ENCRYPTION_ALGORITHM_ERROR, S3:INVALID_LOCATION_CONSTRAINT, S3:INVALID_OBJECT_STATE, S3:INVALID_PART, S3:INVALID_PART_ORDER, S3:INVALID_PAYER, S3:INVALID_POLICY_DOCUMENT, S3:INVALID_RANGE, S3:INVALID_REQUEST, S3:INVALID_RESPONSE_PRESIGNEDURL_MALFORMED, S3:INVALID_SECURITY, S3:INVALID_SOAP_REQUEST, S3:INVALID_STORAGE_CLASS, S3:INVALID_TARGET_BUCKET_FOR_LOGGING, S3:INVALID_TOKEN, S3:INVALID_URI, S3:KEY_TOO_LONG, S3:MALFORMED_ACL_ERROR, S3:MALFORMED_POST_REQUEST, S3:MALFORMED_XML, S3:MAX_MESSAGE_LENGTH_EXCEEDED, S3:MAX_POST_PRE_DATA_LENGTH_EXCEEDED_ERROR, S3:METADATA_TOO_LARGE, S3:METHOD_NOT_ALLOWED, S3:MISSING_ATTACHMENT, S3:MISSING_CONTENT_LENGTH, S3:MISSING_REQUEST_BODY_ERROR, S3:MISSING_SECURITY_ELEMENT, S3:MISSING_SECURITY_HEADER, S3:NOT_IMPLEMENTED, S3:NOT_SIGNED_UP, S3:NO_LOGGING_STATUS_FOR_KEY, S3:NO_SUCH_BUCKET, S3:NO_SUCH_BUCKET_POLICY, S3:NO_SUCH_KEY, S3:NO_SUCH_LIFECYCLE_CONFIGURATION, S3:NO_SUCH_UPLOAD, S3:NO_SUCH_VERSION, S3:OPERATION_ABORTED, S3:PERMANENT_REDIRECT, S3:PRECONDITION_FAILED, S3:REDIRECT, S3:REQUEST_IS_NOT_MULTI_PART_CONTENT, S3:REQUEST_TIMEOUT, S3:REQUEST_TIME_TOO_SKEWED, S3:REQUEST_TORRENT_OF_BUCKET_ERROR, S3:RESTORE_ALREADY_IN_PROGRESS, S3:RETRY_EXHAUSTED, S3:SERVICE_UNAVAILABLE, S3:SIGNATURE_DOES_NOT_MATCH, S3:SLOW_DOWN, S3:TEMPORARY_REDIRECT, S3:TOKEN_REFRESH_REQUIRED, S3:TOO_MANY_BUCKETS, S3:UNEXPECTED_CONTENT, S3:UNKNOWN, S3:UNRESOLVABLE_GRANT_BY_EMAIL_ADDRESS, S3:USER_KEY_MUST_BE_SPECIFIED">
+			<ee:transform doc:name="Transform Message" doc:id="b0c4a259-d940-4acd-8fb8-4d745a8d17c0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Type": "Amazon S3 Error"
+	,"Error": error.description
+ 
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="90989f35-6cba-412f-83ca-a84c245351fe" type="DB:BAD_SQL_SYNTAX, DB:CONNECTIVITY, DB:QUERY_EXECUTION, DB:RETRY_EXHAUSTED">
+			<ee:transform doc:name="Transform Message" doc:id="eb75e1d7-ef8e-456e-a8fb-248f60f72a0f" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Type": "Database Error"
+		,"Error": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df07a4c7-6e32-4aec-96fc-40d2b8d43ff0" type="SALESFORCE:CONNECTIVITY, SALESFORCE:INVALID_INPUT, SALESFORCE:INVALID_RESPONSE, SALESFORCE:LIMIT_EXCEEDED, SALESFORCE:MUTUAL_AUTHENTICATION_FAILED, SALESFORCE:NOT_FOUND, SALESFORCE:RETRY_EXHAUSTED, SALESFORCE:TIMEOUT">
+			<ee:transform doc:name="Transform Message" doc:id="9478dd3e-104a-4492-a712-070281af9c1f" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Type": "Salesforce Error"
+	,"Error": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="37b0e4b2-24bb-4577-b037-5b85bf69b7a2" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="1b3e9c6b-3595-447d-89a4-13b9c0351779" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Type": "Any Error"
+	,"Error": error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+	
+</error-handler>
+</mule>

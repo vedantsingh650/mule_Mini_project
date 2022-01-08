@@ -1,0 +1,23 @@
+[
+    {
+        "ProductID": "PID1",
+        "ProductName": "Kisaan ketchup",
+        "Price": "100",
+        "BrandName": "Kissan",
+        "Stock": "45"
+    },
+    {
+        "ProductID": "PID2",
+        "ProductName": "Watter Bottle",
+        "Price": "15",
+        "BrandName": "Bislery",
+        "Stock": "32"
+    },
+    {
+        "ProductID": "PID3",
+        "ProductName": "Masala Oats",
+        "Price": "30",
+        "BrandName": "Maggi",
+        "Stock": "5"
+    }
+	]
